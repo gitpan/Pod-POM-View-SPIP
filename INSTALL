@@ -1,0 +1,26 @@
+Installing Locust
+=================
+
+Pod::POM::View::SPIP is a view for Pod::POM to translate POD text
+into SPIP markup.
+
+To install the pom2spip script, simply run the following commands
+(where x.xx is the current script version):
+
+    $ tar xvzf Pod-POM-View-SPIP-x.xx.tar.gz
+    $ cd Pod-POM-View-SPIP-x.xx
+    $ perl Makefile.PL
+
+and as root:
+
+    # make install
+
+If you are used to the CPAN way of doing things, the procedure is the
+same as always:
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    # make install
+
+To run the tests, you just need Pod::POM and Pod::POM::View::SPIP.

@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Pod::POM;
+
+my $file = shift
+  or die usage('no filename specified');
+
+my $view = "Pod::POM::View::SPIP";
+Pod::POM->default_view($view)
+  || die "$Pod::POM::ERROR\n";
+
+my $parser = Pod::POM->new( warn => 1, meta => 1,)
+  or die "$Pod::POM::ERROR\n";
+
+my $pom = $parser->parse_file($file)
+  || die $parser->error();
+
+# examine any warnings raised
+foreach my $warning ($parser->warnings()) {
+   warn $warning, "\n";
+}
+
+print Pod::POM::View::SPIP->print($pom);
+
+__END__
+=head1 NAME
+
+pom2spip - convert POD to SPIP markup text with Pod::POM
+
+=head1 SYNOPSIS
+
+    pom2spip  MyFile.pod > Myfile.spip
+
+=head1 DESCRIPTION
+
+This script uses Pod::POM to convert a Pod document into SPIP markup text.
+
+SPIP is a popular CMS in France and elsewhere, and can be found at
+L<http://www.spip.net/>.
+
+The last step to be done by hand is to fuse together POD verbatim sections which
+are separated with blank lines. It could be done easily with the following one
+liner:
+
+    perl -pi -0777e 's!\n<\/code>\n\n<code>\n!\n\n!g' $@
+
+=head1 AUTHOR
+
+Jérôme FENAL E<lt>jfenal@free.frE<gt>
+
+=head1 VERSION
+
+This is version 0.1 of pom2spip.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Jérôme Fenal.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+For further information please see L<Pod::POM>.
+
+

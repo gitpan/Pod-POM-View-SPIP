@@ -1,0 +1,6 @@
+./lib/Pod/POM/View/SPIP.pm
+./bin/pom2spip
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+INSTALL
+MANIFEST
