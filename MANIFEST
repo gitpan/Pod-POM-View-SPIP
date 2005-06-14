@@ -1,6 +1,15 @@
-./lib/Pod/POM/View/SPIP.pm
-./bin/pom2spip
+lib/Pod/POM/View/SPIP.pm
+bin/pom2spip
 META.yml                                 Module meta-data (added by MakeMaker)
+Build.PL
 Makefile.PL
 INSTALL
+README
 MANIFEST
+t/00distchk.t
+t/00portfs.t
+t/00prereq.t
+t/10head.t
+t/11inline.t
+t/12item.t
+Changes

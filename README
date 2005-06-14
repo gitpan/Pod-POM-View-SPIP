@@ -1,0 +1,13 @@
+
+README file for Pod::POM::View::SPIP
+------------------------------------
+
+SPIP is a popular CMS in France.
+
+This view for Pod::POM permits to translate Pod text into SPIP markup,
+in order to publish some articles, written in Pod, on a SPIP intranet.
+
+There are still some glitches (I should improve and think about more
+tests), the one known are documented in Pod::POM::View::SPIP(3pm).
+
+This module obviously requires Pod::POM.

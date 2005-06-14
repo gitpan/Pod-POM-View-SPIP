@@ -1,11 +1,16 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Pod-POM-View-SPIP
-version:      0.01
-version_from: 
-installdirs:  site
+---
+name: Pod-POM-View-SPIP
+version: 0.02
+author:
+  - Jérôme Fenal E<lt>jfenal@free.frE<gt>
+abstract: POD Object Model View for SPIP
+license: perl
 requires:
-    Pod::POM:                      
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Pod::POM: 0
+recommends:
+  Test::More: 0
+provides:
+  Pod::POM::View::SPIP:
+    file: lib/Pod/POM/View/SPIP.pm
+    version: 0.02
+generated_by: Module::Build version 0.261

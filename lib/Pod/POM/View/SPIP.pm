@@ -7,9 +7,8 @@ use Pod::POM::View;
 use base qw( Pod::POM::View );
 use vars qw( $VERSION $DEBUG $ERROR $AUTOLOAD $INDENTLEVEL );
 use Text::Wrap;
-use Data::Dumper;
 
-$VERSION     = sprintf("%d.%02d", q$Revision: 0.1 $ =~ /(\d+)\.(\d+)/);
+$VERSION     = 0.02;
 $DEBUG       = 0 unless defined $DEBUG;
 $INDENTLEVEL = 0;
 
@@ -44,7 +43,11 @@ write articles, we needed a way to translate POD text into SPIP markup.
 
 This view for L<Pod::POM(3)> implements it. 
 
-=head1 VIEW DETAILS
+=head1 METHODS
+
+=head2 new
+
+Class constructor. Used by L<Pod::POM>.
 
 =cut
 
@@ -59,6 +62,16 @@ sub new {
     return $self;
 }
 
+=head1 VIEW DETAILS
+
+=over
+
+=item *
+view
+
+Implement L<Pod::POM> C<view> method
+
+=cut
 
 sub view {
     my ($self, $type, $item) = @_;
@@ -67,11 +80,11 @@ sub view {
         return $item;
     }
     elsif (UNIVERSAL::isa($item, 'HASH')) {
-        if (defined $item->{ content }) {
-            return $item->{ content }->present($self);
+        if (defined $item->{content}) {
+            return $item->{content}->present($self);
         }
-        elsif (defined $item->{ text }) {
-            my $text = $item->{ text };
+        elsif (defined $item->{text}) {
+            my $text = $item->{text};
             return ref $text ? $text->present($self) : $text;
         }
         else {
@@ -89,7 +102,8 @@ sub view {
 
 =pod 
 
-=head2 C<=head1> sections
+=item *
+view_head1
 
 C<=head1> POD sections are translated to the following SPIP markup:
 
@@ -99,7 +113,7 @@ becomes:
 
   {{{Title}}}
 
-which is the title markup.
+which is the SPIP classic title markup.
 
 =cut
 
@@ -113,7 +127,8 @@ sub view_head1 {
 
 =pod 
 
-=head2 C<=head2> sections
+=item *
+view_head2
 
 C<=head2> POD sections are translated to the following SPIP markup:
 
@@ -139,9 +154,10 @@ sub view_head2 {
 
 =pod 
 
-=head2 C<=head3> sections
+=item *
+view_head3
 
-head3 POD sections are translated to the following SPIP markup:
+C<=head3> POD sections are translated to the following SPIP markup:
 
   =head3 Title
 
@@ -160,7 +176,8 @@ sub view_head3 {
     return $output;
 }
 
-=head2 C<=head4> sections
+=item *
+view_head4
 
 C<=head4> POD sections are translated to the following SPIP markup:
 
@@ -184,6 +201,13 @@ sub view_head4 {
     return $output;
 }
 
+=item *
+view_over
+
+C<view_over> only counts indent levels.
+
+=cut
+
 sub view_over {
     my ($self, $over) = @_;
     my $indentlevel = ref $self ? \$self->{ INDENTLEVEL } : \$INDENTLEVEL;
@@ -194,7 +218,8 @@ sub view_over {
     return $content;
 }
 
-=head2 C<=item> sections
+=item *
+view_item
 
 C<=item> POD sections (enclosed between C<=over> & C<=back>) are translated to
 the following SPIP markup:
@@ -243,40 +268,59 @@ the first level (C<_> prefix).
 
 sub view_item {
     my ($self, $item) = @_;
-    my $indentlevel = ref $self ? \$self->{ INDENTLEVEL } : \$INDENTLEVEL;
+    my $indentlevel = ref $self ? \$self->{INDENTLEVEL} : \$INDENTLEVEL;
 
     my $title = $item->title->present($self);
+    my $content = $item->content->present($self);
+    $content =~ s/(?:\r?\n)+$//m;
 
     # Taken from Pod::POM::View::HTML::view_over
-    if ($title =~ /^\s*\*\s*/) {
+    if ($title =~ /^\s*\*\s*/ || ($title =~ /^\s[^*]/ && $indentlevel > 1)) {
         # '=item *' => <ul>
         $title =~ s/^\s*\*\s*//;
+        if ($title eq '') {
+            $title = $content;
+            $content='';
+        }
         $title = '-' . ('*' x $$indentlevel) . ' ' . $title;
     }
     elsif ($title =~ /^\s*\d+\.?\s*/) {
         # '=item 1.' or '=item 1 ' => <ol>
         $title =~ s/^\s*\d+\.?\s*//;
+        if ($title eq '') {
+            $title = $content;
+            $content='';
+        }
         $title = '-' . ('#' x $$indentlevel) . ' ' . $title;
     }
     else {
         $title = "_$title";
     }
 
-#    $title =~ s/\r?\n//mg;
-#    $title =~ s/:?$//m;
-
-    my $content = $item->content->present($self);
-    $content =~ s/(?:\r?\n)+$//m;
-
     return $content ? "$title\n$content\n" : "$title\n";
 }
 
+=item *
+view_for
+
+The C<=for> sections are passed directly without any transformation.
+
+=cut
+
 sub view_for {
     my ($self, $for) = @_;
-    return '' unless $for->format() =~ /\bspip\b/;
+    return '' unless $for->format() =~ /\bspip|html\b/;
     return $for->text()
 	. "\n\n";
 }
+
+=item *
+view_begin
+
+Return only C<=begin spip> sections.
+FIXME: maybe it should return anything...
+
+=cut
 
 sub view_begin {
     my ($self, $begin) = @_;
@@ -285,6 +329,13 @@ sub view_begin {
 }
 
     
+=item *
+view_textblock
+
+Suppress leading spaces and return text from text blocks.
+
+=cut
+
 sub view_textblock {
     my ($self, $text) = @_;
 #    my $indent = ref $self ? \$self->{ INDENT } : \$INDENT;
@@ -293,13 +344,14 @@ sub view_textblock {
 #    $$indent ||= 0;
 #    my $pad = ' ' x $$indent;
 #    return wrap($pad, $pad, $text) . "\n\n";
-    return $text . "\n\n";
+    return wrap('', '', $text) . "\n\n";
 }
 
 
-=head2 verbatim sections
+=item *
+view_verbatim
 
-verbatim POD sections are translated to the following SPIP markup:
+Verbatim POD sections are translated to the following SPIP markup:
 
   <code>
   some code
@@ -316,7 +368,8 @@ sub view_verbatim {
     return "<code>\n$text\n</code>\n\n";
 }
 
-=head2 Bold text
+=item *
+view_seq_bold
 
 Bold text is translated to the following SPIP markup:
 
@@ -327,10 +380,15 @@ Bold text is translated to the following SPIP markup:
 
 sub view_seq_bold {
     my ($self, $text) = @_;
+    
+    return "{{ $text }}"
+        if (substr($text, 0, 1) eq '{' && substr($text, -1, 1) eq '}');
+
     return "{{$text}}";
 }
 
-=head2 Italic text
+=item *
+view_seq_italic
 
 Italic text is translated to the following SPIP markup:
 
@@ -340,10 +398,15 @@ Italic text is translated to the following SPIP markup:
 
 sub view_seq_italic {
     my ($self, $text) = @_;
+
+    return "{ $text }"
+        if (substr($text, 0, 1) eq '{' && substr($text, -1, 1) eq '}');
+
     return "{$text}";
 }
 
-=head2 Code text
+=item *
+view_seq_code
 
 Code text is translated to the following SPIP markup:
 
@@ -357,13 +420,51 @@ sub view_seq_code {
     return "<code>$text</code>";
 }
 
+=item *
+view_seq_file
 
-my $entities = {
-    gt   => '>',
-    lt   => '<',
-    amp  => '&',
-    quot => '"',
-};
+File text is translated to the following SPIP markup:
+
+  <code>/path/to/file</code>
+
+=cut
+
+
+sub view_seq_file {
+    my ($self, $text) = @_;
+    return "<code>$text</code>";
+}
+
+=item *
+view_seq_entities
+
+Code text is translated to the following SPIP markup:
+
+  <code>some inline code</code>
+
+=cut
+my %entities = (
+    gt   => '&gt;',
+    lt   => '&lt;',
+    amp  => '&amp;',
+    quot => '&quot;',
+);
+
+
+
+sub view_seq_entities {
+    my ($self, $text) = @_;
+    return $entities{$text} if defined $entities{$text};
+    return $text;
+}
+
+
+=item *
+view_seq_link
+
+Links are treated as in L<Pod::POM::View::HTML>.
+
+=cut
 
 #
 # From Pod::POM::View::HTML
@@ -428,7 +529,14 @@ sub view_seq_link {
 #
 # META: where this functionality should be documented? This module
 # doesn't have docs section
-#
+
+=item *
+view_seq_link_transform_path
+
+FIXME 
+view_seq_link_transform_path should handle links to other articles, etc.
+
+=cut
 sub view_seq_link_transform_path {
     my($self, $page) = @_;
 
@@ -444,6 +552,15 @@ sub view_seq_link_transform_path {
     return undef;
 }
 
+
+=item *
+make_href
+
+Identify and create links into SPIP links
+
+For now, just make the link as C<[title->link]>.
+
+=cut
 
 sub make_href {
     my($url, $title) = @_;
@@ -474,44 +591,54 @@ my $gunk = '/#~:.?+=&%@!\-';
 my $punc = '.:!?\-;';
 my $any  = "${ltrs}${gunk}${punc}";
 
+
+=item *
+view_seq_text
+
+FIXME:
+view_seq_text should be filtering some specific markup, such as
+HTML-like tags, which should be transformed using entities.
+
+=cut
+
 sub view_seq_text {
     my ($self, $text) = @_;
 
-#    unless ($HTML_PROTECT) {
-#        for ($text) {
-#            s/&/&amp;/g;
-#            s/</&lt;/g;
-#            s/>/&gt;/g;
-#        }
-#    }
+     for ($text) {
+         s/&/&amp;/g;
+         s/</&lt;/g;
+         s/>/&gt;/g;
+     }
 
-    $text =~ s{
-        \b                           # start at word boundary
-         (                           # begin $1  {
-           $urls     :               # need resource and a colon
-           (?!:)                     # Ignore File::, among others.
-           [$any] +?                 # followed by one or more of any valid
-                                     #   character, but be conservative and
-                                     #   take only what you need to....
-         )                           # end   $1  }
-         (?=                         # look-ahead non-consumptive assertion
-                 [$punc]*            # either 0 or more punctuation followed
-                 (?:                 #   followed
-                     [^$any]         #   by a non-url char
-                     |               #   or
-                     $               #   end of the string
-                 )                   #
-             |                       # or else
-                 $                   #   then end of the string
-         )
-       }{[->$1]}igox;
+     $text =~ s{
+         \b                           # start at word boundary
+          (                           # begin $1  {
+            $urls     :               # need resource and a colon
+            (?!:)                     # Ignore File::, among others.
+            [$any] +?                 # followed by one or more of any valid
+                                      #   character, but be conservative and
+                                      #   take only what you need to....
+          )                           # end   $1  }
+          (?=                         # look-ahead non-consumptive assertion
+                  [$punc]*            # either 0 or more punctuation followed
+                  (?:                 #   followed
+                      [^$any]         #   by a non-url char
+                      |               #   or
+                      $               #   end of the string
+                  )                   #
+              |                       # or else
+                  $                   #   then end of the string
+          )
+        }{[->$1]}igox;
 
-     return $text;
+     return "$text";
 }
 
 1;
 
 __END__
+
+=back
 
 =head1 BUGS
 
@@ -527,7 +654,7 @@ Jérôme Fenal E<lt>jfenal@free.frE<gt>
 
 =head1 VERSION
 
-This is version 0.1 of the Pod::POM::View::SPIP module.
+This is version 0.02 of the Pod::POM::View::SPIP module.
 
 =head1 COPYRIGHT
 

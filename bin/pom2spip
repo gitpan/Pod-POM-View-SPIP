@@ -43,7 +43,7 @@ The last step to be done by hand is to fuse together POD verbatim sections which
 are separated with blank lines. It could be done easily with the following one
 liner:
 
-    perl -pi -0777e 's!\n<\/code>\n\n<code>\n!\n\n!g' $@
+    perl -pi -0777e 's!\n<\/code>\n\n<code>\n!\n\n!g' Myfile.spip
 
 =head1 AUTHOR
 
@@ -51,7 +51,7 @@ Jérôme FENAL E<lt>jfenal@free.frE<gt>
 
 =head1 VERSION
 
-This is version 0.1 of pom2spip.
+This is version 0.02 of pom2spip.
 
 =head1 COPYRIGHT
 

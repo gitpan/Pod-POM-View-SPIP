@@ -1,5 +1,5 @@
-Installing Locust
-=================
+Installing Pod::POM::View::SPIP
+===============================
 
 Pod::POM::View::SPIP is a view for Pod::POM to translate POD text
 into SPIP markup.
