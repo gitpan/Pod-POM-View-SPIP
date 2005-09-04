@@ -8,7 +8,7 @@ use base qw( Pod::POM::View );
 use vars qw( $VERSION $DEBUG $ERROR $AUTOLOAD $INDENTLEVEL );
 use Text::Wrap;
 
-$VERSION     = 0.02;
+$VERSION     = 0.03;
 $DEBUG       = 0 unless defined $DEBUG;
 $INDENTLEVEL = 0;
 
@@ -654,7 +654,7 @@ Jérôme Fenal E<lt>jfenal@free.frE<gt>
 
 =head1 VERSION
 
-This is version 0.02 of the Pod::POM::View::SPIP module.
+This is version 0.03 of the Pod::POM::View::SPIP module.
 
 =head1 COPYRIGHT
 

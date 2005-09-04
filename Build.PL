@@ -2,7 +2,7 @@ use Module::Build;
 my $build = Module::Build->new(
     module_name  => 'Pod::POM::View::SPIP',
     version_from => 'lib/Pod/POM/View/SPIP.pm',
-    scripts      => 'bin/pom2spip',
+    scripts      => 'script/pom2spip',
     license      => 'perl',
     requires     => {
         'Pod::POM'       => 0,

@@ -1,6 +1,6 @@
 ---
 name: Pod-POM-View-SPIP
-version: 0.02
+version: 0.03
 author:
   - Jérôme Fenal E<lt>jfenal@free.frE<gt>
 abstract: POD Object Model View for SPIP
@@ -12,5 +12,5 @@ recommends:
 provides:
   Pod::POM::View::SPIP:
     file: lib/Pod/POM/View/SPIP.pm
-    version: 0.02
-generated_by: Module::Build version 0.261
+    version: 0.03
+generated_by: Module::Build version 0.2611

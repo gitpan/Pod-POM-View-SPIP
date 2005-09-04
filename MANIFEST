@@ -1,11 +1,13 @@
 lib/Pod/POM/View/SPIP.pm
-bin/pom2spip
+script/pom2spip
 META.yml                                 Module meta-data (added by MakeMaker)
 Build.PL
 Makefile.PL
 INSTALL
 README
 MANIFEST
+t/pod.t
+t/pod-coverage.t
 t/00distchk.t
 t/00portfs.t
 t/00prereq.t

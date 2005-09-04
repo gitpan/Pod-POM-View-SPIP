@@ -51,7 +51,7 @@ Jérôme FENAL E<lt>jfenal@free.frE<gt>
 
 =head1 VERSION
 
-This is version 0.02 of pom2spip.
+This is version 0.03 of pom2spip.
 
 =head1 COPYRIGHT
 
@@ -63,5 +63,3 @@ modify it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 For further information please see L<Pod::POM>.
-
-
